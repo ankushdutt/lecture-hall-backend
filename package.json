@@ -8,5 +8,5 @@
     "express": "^4.17.1"
   },
   "postinstall": "yarn run build",
-  "start": "node server.js"
+  "start": "node index.js"
 }
