@@ -8,8 +8,7 @@
     "express": "^4.17.1"
   },
   "scripts": {
-    "start": "node index.js",
-    "postinstall": "yarn run build"
+    "start": "node index.js"
   },
   "engines": {
     "node": "14.x",
