@@ -2,6 +2,10 @@ import express from "express";
 
 const app = express();
 
+app.get("/", (req, res) => {
+  res.send("Hello");
+});
+
 app.delete("/allocation/:id", (req, res) => {
   res.send(
     `Server: Got a DELETE request to delete lecture hall with id: ${req.params.id}`
