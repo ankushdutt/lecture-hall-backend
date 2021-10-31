@@ -7,6 +7,8 @@
   "dependencies": {
     "express": "^4.17.1"
   },
-  "postinstall": "yarn run build",
-  "start": "node index.js"
+  "scripts": {
+    "start": "node index.js",
+    "postinstall": "yarn run build"
+  }
 }
