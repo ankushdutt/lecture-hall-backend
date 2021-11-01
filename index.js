@@ -8,14 +8,20 @@ const app = express();
 app.use(cors());
 
 console.log(process.env.JAWSDB_URL);
-var connection = mysql.createConnection(process.env.JAWSDB_URL);
-connection.connect(function (err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
+var con = mysql.createConnection(process.env.JAWSDB_URL);
 
 app.get("/", (req, res) => {
   res.send("Hello");
+});
+
+app.get("/lecturehall/all", async function (req, res, next) {
+  con.connect(function (err) {
+    if (err) throw err;
+    con.query("SELECT * FROM lecture_hall", function (err, result, fields) {
+      if (err) throw err;
+      res.send(result);
+    });
+  });
 });
 
 app.delete("/allocation/:id", (req, res) => {
