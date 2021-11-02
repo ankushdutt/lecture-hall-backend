@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 
 console.log(process.env.JAWSDB_URL);
 var con = mysql.createConnection(process.env.JAWSDB_URL);
