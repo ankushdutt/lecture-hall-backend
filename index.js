@@ -7,20 +7,17 @@ dotenv.config();
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
 
-console.log(process.env.JAWSDB_URL);
 var con = mysql.createConnection(process.env.JAWSDB_URL);
+con.connect();
 
 app.get("/", (req, res) => {
   res.send("Hello");
 });
 
 app.get("/lecturehall/all", async function (req, res, next) {
-  con.connect(function (err) {
+  con.query("SELECT * FROM lecture_hall", function (err, result, fields) {
     if (err) throw err;
-    con.query("SELECT * FROM lecture_hall", function (err, result, fields) {
-      if (err) throw err;
-      res.send(result);
-    });
+    res.send(result);
   });
 });
 
