@@ -2,20 +2,46 @@ import express from "express";
 import cors from "cors";
 import mysql from "mysql";
 import dotenv from "dotenv";
+import passport from "passport";
+import LocalStrategy from "passport-local";
 
 dotenv.config();
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
 
-var con = mysql.createConnection(process.env.JAWSDB_URL);
-con.connect();
+var db = mysql.createConnection(process.env.JAWSDB_URL);
+db.connect();
 
-app.get("/", (req, res) => {
-  res.send("Hello");
-});
+passport.use(
+  new LocalStrategy(function verify(email, password, cb) {
+    db.query(
+      "SELECT * FROM user WHERE email = " +
+        email +
+        " AND password = " +
+        password,
+      function (err, result, fields) {
+        if (err) {
+          return cb(err);
+        }
+        if (!result) {
+          return cb(null, false, { message: "Incorrect email or password." });
+        }
+        return cb(null, user);
+      }
+    );
+  })
+);
+
+app.post(
+  "/login",
+  passport.authenticate("local", { failureMessage: true }),
+  (req, res) => {
+    res.send({ status: success });
+  }
+);
 
 app.get("/lecturehall/all", async function (req, res, next) {
-  con.query("SELECT * FROM lecture_hall", function (err, result, fields) {
+  db.query("SELECT * FROM lecture_hall", function (err, result, fields) {
     if (err) throw err;
     res.send(result);
   });
@@ -25,6 +51,10 @@ app.delete("/allocation/:id", (req, res) => {
   res.send(
     `Server: Got a DELETE request to delete lecture hall with id: ${req.params.id}`
   );
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello");
 });
 
 const PORT = process.env.PORT || 5000;
