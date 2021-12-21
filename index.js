@@ -36,7 +36,7 @@ app.post(
   "/login",
   passport.authenticate("local", { failureMessage: true }),
   (req, res) => {
-    res.send({ status: success });
+    res.sendStatus(200);
   }
 );
 
