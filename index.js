@@ -63,6 +63,55 @@ app.post("/login", function (req, res, next) {
   })(req, res, next);
 });
 
+app.post("/lecturehall/available",async (req,res) => {
+
+  if(!req.body.capacity || !req.body.start || !req.body.end)
+    return res.status(400).send({msg: 'Invalid Input'})
+
+  const sql = "select * from lecture_hall " +
+  "where max_capacity > " + req.body.capacity + " " +
+  "and lh_id not in(" +
+  "select l.lh_id from lecture_hall l, booking b " +
+  "where l.lh_id = b.lh_id and " +
+  "b.alloc_start = '" + req.body.start + "' and " +
+  "b.alloc_end = '" + req.body.end + "')";
+
+  db.query(sql,(err,result) => {
+    if(err) throw err;
+    res.send(result);
+  })
+})
+
+app.post("/lecturehall/booked", async (req,res) => {
+  
+  if(!req.body.capacity || !req.body.start || !req.body.end)
+    return res.status(400).send({msg: 'Invalid Input'})
+
+  const sql = "select * from lecture_hall l, booking b " +
+  "where l.lh_id = b.lh_id and " +
+  "b.alloc_start = '" + req.body.start + "' and " +
+  "b.alloc_end = '" + req.body.end + "'";
+
+  db.query(sql, (err,result) => {
+    if(err) throw err;
+    res.send(result);
+  })
+})
+
+app.post('/lecturehall/available/:lh_id',(req,res) => {
+  const sql = "insert into booking " +
+  "(user_id,lh_id,alloc_start,alloc_end,purpose,booking_status) " +
+  "values(" + req.body.user_id + "," +
+  req.params.lh_id + ",'" + req.body.start + "','" +
+  req.body.end +"','" + req.body.purpose + "'," +
+  req.body.status + ")"
+
+  db.query(sql,(err,result) => {
+    if(err) throw err;
+    res.send({msg:"Lecture Hall is booked",result});
+  })
+})
+
 app.get("/lecturehall/all", async function (req, res, next) {
   db.query("SELECT * FROM lecture_hall", function (err, result, fields) {
     if (err) throw err;
