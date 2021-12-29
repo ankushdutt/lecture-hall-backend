@@ -69,7 +69,7 @@ app.post("/lecturehall/available",async (req,res) => {
     return res.status(400).send({msg: 'Invalid Input'})
 
   const sql = "select * from lecture_hall " +
-  "where max_capacity > " + req.body.capacity + " " +
+  "where max_capacity >= " + req.body.capacity + " " +
   "and lh_id not in(" +
   "select l.lh_id from lecture_hall l, booking b " +
   "where l.lh_id = b.lh_id and " +
@@ -89,6 +89,7 @@ app.post("/lecturehall/booked", async (req,res) => {
 
   const sql = "select * from lecture_hall l, booking b " +
   "where l.lh_id = b.lh_id and " +
+  "max_capacity >= " + req.body.capacity + " and " +
   "b.alloc_start = '" + req.body.start + "' and " +
   "b.alloc_end = '" + req.body.end + "'";
 
