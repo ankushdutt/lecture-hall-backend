@@ -54,63 +54,85 @@ app.post("/login", function (req, res, next) {
       return next(err);
     }
     if (!user) {
-      return res.status(201).send("Incorrect email or password");
+      return res.status(202).send("Incorrect email or password");
     }
     req.login(user, (err) => {
       if (err) throw err;
-      res.status(200).send("Successfully Authenticated");
+      if (user[0].designation === "admin")
+        res.status(201).send("Admin Success");
+      else res.status(200).send("Successfully Authenticated");
     });
   })(req, res, next);
 });
 
-app.post("/lecturehall/available",async (req,res) => {
+app.post("/lecturehall/available", async (req, res) => {
+  if (!req.body.capacity || !req.body.start || !req.body.end)
+    return res.status(400).send({ msg: "Invalid Input" });
 
-  if(!req.body.capacity || !req.body.start || !req.body.end)
-    return res.status(400).send({msg: 'Invalid Input'})
+  const sql =
+    "select * from lecture_hall " +
+    "where max_capacity > " +
+    req.body.capacity +
+    " " +
+    "and lh_id not in(" +
+    "select l.lh_id from lecture_hall l, booking b " +
+    "where l.lh_id = b.lh_id and " +
+    "b.alloc_start = '" +
+    req.body.start +
+    "' and " +
+    "b.alloc_end = '" +
+    req.body.end +
+    "')";
 
-  const sql = "select * from lecture_hall " +
-  "where max_capacity > " + req.body.capacity + " " +
-  "and lh_id not in(" +
-  "select l.lh_id from lecture_hall l, booking b " +
-  "where l.lh_id = b.lh_id and " +
-  "b.alloc_start = '" + req.body.start + "' and " +
-  "b.alloc_end = '" + req.body.end + "')";
-
-  db.query(sql,(err,result) => {
-    if(err) throw err;
+  db.query(sql, (err, result) => {
+    if (err) throw err;
     res.send(result);
-  })
-})
+  });
+});
 
-app.post("/lecturehall/booked", async (req,res) => {
-  
-  if(!req.body.capacity || !req.body.start || !req.body.end)
-    return res.status(400).send({msg: 'Invalid Input'})
+app.post("/lecturehall/booked", async (req, res) => {
+  if (!req.body.capacity || !req.body.start || !req.body.end)
+    return res.status(400).send({ msg: "Invalid Input" });
 
-  const sql = "select * from lecture_hall l, booking b " +
-  "where l.lh_id = b.lh_id and " +
-  "b.alloc_start = '" + req.body.start + "' and " +
-  "b.alloc_end = '" + req.body.end + "'";
+  const sql =
+    "select * from lecture_hall l, booking b " +
+    "where l.lh_id = b.lh_id and " +
+    "b.alloc_start = '" +
+    req.body.start +
+    "' and " +
+    "b.alloc_end = '" +
+    req.body.end +
+    "'";
 
-  db.query(sql, (err,result) => {
-    if(err) throw err;
+  db.query(sql, (err, result) => {
+    if (err) throw err;
     res.send(result);
-  })
-})
+  });
+});
 
-app.post('/lecturehall/available/:lh_id',(req,res) => {
-  const sql = "insert into booking " +
-  "(user_id,lh_id,alloc_start,alloc_end,purpose,booking_status) " +
-  "values(" + req.body.user_id + "," +
-  req.params.lh_id + ",'" + req.body.start + "','" +
-  req.body.end +"','" + req.body.purpose + "'," +
-  req.body.status + ")"
+app.post("/lecturehall/available/:lh_id", (req, res) => {
+  const sql =
+    "insert into booking " +
+    "(user_id,lh_id,alloc_start,alloc_end,purpose,booking_status) " +
+    "values(" +
+    req.body.user_id +
+    "," +
+    req.params.lh_id +
+    ",'" +
+    req.body.start +
+    "','" +
+    req.body.end +
+    "','" +
+    req.body.purpose +
+    "'," +
+    req.body.status +
+    ")";
 
-  db.query(sql,(err,result) => {
-    if(err) throw err;
-    res.send({msg:"Lecture Hall is booked",result});
-  })
-})
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send({ msg: "Lecture Hall is booked", result });
+  });
+});
 
 app.get("/lecturehall/all", async function (req, res, next) {
   db.query("SELECT * FROM lecture_hall", function (err, result, fields) {
@@ -126,7 +148,13 @@ app.delete("/allocation/:id", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello");
+  res.send("Hello!!!");
+});
+
+// Allocate from parsed CSV
+app.post("/allocate", (req, res) => {
+  console.log("req: ", req.body);
+  res.send("Successfully allocated");
 });
 
 // Listen
