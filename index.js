@@ -156,6 +156,39 @@ app.post("/allocate", (req, res) => {
   console.log("req: ", req.body);
   res.send("Successfully allocated");
 });
+app.put('/lecturehall/profile', function (req, res) {
+  if (!req.body.email)
+  return res.status(400).send({ msg: "Invalid Input" });
+  var email = req.body.email;
+  const sql =
+  "update user " +
+  "set email = " +
+  email +
+  "where user_id = " +
+  user_id;
+  
+db.query(sql, (err, result) => {
+  if (err) throw err;
+  res.send({ msg: "Incorrect user_id", result });
+});
+});
+
+app.put('/lecturehall/profile', function (req, res) {
+  if (!req.body.password)
+  return res.status(400).send({ msg: "Invalid Input" });
+  var password = req.body.password;
+  const sql =
+  "update user " +
+  "set password = " +
+  password +
+  "where user_id = " +
+  user_id;
+  
+db.query(sql, (err, result) => {
+  if (err) throw err;
+  res.send({ msg: "Incorrect password", result });
+}); 
+});
 
 // Listen
 const PORT = process.env.PORT || 5000;
