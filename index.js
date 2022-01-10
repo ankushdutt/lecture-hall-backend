@@ -147,9 +147,8 @@ app.delete("/allocation/:id", (req, res) => {
   );
 });
 
-// TODO: Inserts into Time Table database
+// Inserts into Time Table database
 app.post("/admin/timetable", (req, res) => {
-  res.send(`Server: Got a POST request to add timetable with id: ${req.body}`);
   let t_id = [],
     lt_no = [],
     day = [],
@@ -182,21 +181,48 @@ app.post("/admin/timetable", (req, res) => {
   d.push(enrolled_student_count);
   console.log(d);
   let sql =
-    "INSERT INTO time_table (t_id, lt_no, day, day, batch, subject, lecturer, time_start, time_end, enrolled_student_count) VALUES (";
+    "INSERT INTO time_table (t_id, lt_no, day, batch, subject, lecturer, time_start, time_end, enrolled_student_count) VALUES (";
   let k = 0;
-  for (let i = 0; i < d.length; i++) {
+  for (let i = 0; i < d[0].length; i++) {
     for (let j = 0; j < d.length; j++) {
-      sql += "'" + d[j][k] + "',";
+      if (j == d.length - 1) {
+        sql += "'" + d[j][k] + "'";
+      } else {
+        sql += "'" + d[j][k] + "',";
+      }
+    }
+    if (i == d[0].length - 1) {
+      sql += ");";
+    } else {
+      sql += "), (";
     }
     k = k + 1;
   }
-  sql = sql.substring(0, sql.length - 1);
-  sql += ");";
+
   console.log(sql);
-  // db.query(sql, (err, result) => {
-  //   if (err) throw err;
-  //   res.send(result);
-  // });
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+// Empty Time Table Database
+app.delete("/admin/timetable", (req, res) => {
+  db.query("truncate time_table", (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+// DELETE user from database
+app.delete("/users/:id", (req, res) => {
+  db.query(
+    `DELETE FROM user WHERE user_id = '$(req.params.id)'`,
+    (err, result, fields) => {
+      if (err) throw err;
+      res.send(result);
+    }
+  );
 });
 
 // GET Users from database
