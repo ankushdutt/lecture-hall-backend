@@ -71,7 +71,7 @@ app.post("/lecturehall/available", async (req, res) => {
 
   const sql =
     "select * from lecture_hall " +
-    "where max_capacity > " +
+    "where max_capacity >= " +
     req.body.capacity +
     " " +
     "and lh_id not in(" +
@@ -101,8 +101,8 @@ app.post("/lecturehall/booked", async (req, res) => {
     req.body.start +
     "' and " +
     "b.alloc_end = '" +
-    req.body.end +
-    "'";
+    req.body.end + "' " +
+    "and max_capacity >= " + req.body.capacity;
 
   db.query(sql, (err, result) => {
     if (err) throw err;
