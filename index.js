@@ -245,6 +245,18 @@ app.get("/admin/pending", (req, res) => {
   );
 });
 
+// Approve Bookings
+app.post("/admin/approve/:booking_id", (req, res) => {
+  db.query(
+    "UPDATE booking SET booking_status = 1 WHERE booking_id = " +
+      req.params.booking_id,
+    (err, result, fields) => {
+      if (err) throw err;
+      res.send(result);
+    }
+  );
+});
+
 // Allocate from parsed CSV
 app.post("/allocate", (req, res) => {
   console.log("req: ", req.body);
