@@ -126,10 +126,10 @@ app.post("/lecturehall/available/:lh_id", (req, res) => {
     "'," +
     req.body.status +
     ")";
-
+    console.log(sql)
   db.query(sql, (err, result) => {
     if (err) throw err;
-    res.send({ msg: "Lecture Hall is booked", result });
+    res.send(result);
   });
 });
 
