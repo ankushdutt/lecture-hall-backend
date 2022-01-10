@@ -250,6 +250,15 @@ app.post("/lecturehall/profile/searchemail", function (req, res) {
     });
   }
 });
+
+app.get("/lecturehall/allocated/:user_id", (req, res) => {
+  const sql = `SELECT * FROM booking WHERE user_id = ${req.params.user_id}`;
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
 app.put("/lecturehall/profile/updateemail", function (req, res) {
   var newemail = req.body.newemail;
   var oldemail = req.body.oldemail;
