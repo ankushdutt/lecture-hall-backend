@@ -100,8 +100,10 @@ app.post("/lecturehall/booked", async (req, res) => {
     req.body.start +
     "' and " +
     "b.alloc_end = '" +
-    req.body.end + "' " +
-    "and max_capacity >= " + req.body.capacity;
+    req.body.end +
+    "' " +
+    "and max_capacity >= " +
+    req.body.capacity;
 
   db.query(sql, (err, result) => {
     if (err) throw err;
@@ -126,7 +128,7 @@ app.post("/lecturehall/available/:lh_id", (req, res) => {
     "'," +
     req.body.status +
     ")";
-    console.log(sql)
+  console.log(sql);
   db.query(sql, (err, result) => {
     if (err) throw err;
     res.send(result);
@@ -230,6 +232,17 @@ app.get("/users", (req, res) => {
     if (err) throw err;
     res.send(result);
   });
+});
+
+// GET Pending Bookings
+app.get("/admin/pending", (req, res) => {
+  db.query(
+    "SELECT * FROM booking WHERE booking_status = 2",
+    (err, result, fields) => {
+      if (err) throw err;
+      res.send(result);
+    }
+  );
 });
 
 // Allocate from parsed CSV
