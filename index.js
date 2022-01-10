@@ -238,6 +238,59 @@ app.post("/allocate", (req, res) => {
   console.log("req: ", req.body);
   res.send("Successfully allocated");
 });
+app.post('/lecturehall/profile/searchemail', function(req, res)
+{
+  if (!req.body.email){
+  res.status(400).send({ msg: "Invalid Input" });}
+  else{
+  var email = req.body.email;
+  console.log(email);
+  const sql =
+  "SELECT * FROM user WHERE email ='"+
+        email+"'";
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+  }
+});
+app.put('/lecturehall/profile/updateemail', function (req, res) {
+  var newemail= req.body.newemail;
+  var oldemail = req.body.oldemail;
+  const sql =
+  "update user " +
+  "set email = '" +
+  newemail + "' where email = '" +
+  oldemail + "'";
+
+db.query(sql, (err, result) => {
+  console.log(result.message);
+  if (err) throw err;
+  if(result.affectedRows!=0)
+  res.status(200).send("ok");
+  else{
+    res.status(404).send("Not found");
+  }
+
+});
+});
+
+app.put('/lecturehall/profile', function (req, res) {
+  if (!req.body.password)
+  return res.status(400).send({ msg: "Invalid Input" });
+  var password = req.body.password;
+  const sql =
+  "update user " +
+  "set password = " +
+  password +
+  "where user_id = " +
+  user_id;
+  
+db.query(sql, (err, result) => {
+  if (err) throw err;
+  res.send({ msg: "Incorrect password", result });
+}); 
+});
 
 app.get("/", (req, res) => {
   res.send("Hello!!!");
