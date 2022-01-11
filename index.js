@@ -68,20 +68,7 @@ app.post("/lecturehall/available", async (req, res) => {
   if (!req.body.capacity || !req.body.start || !req.body.end)
     return res.status(400).send({ msg: "Invalid Input" });
 
-  const sql =
-    "select * from lecture_hall " +
-    "where max_capacity >= " +
-    req.body.capacity +
-    " " +
-    "and lh_id not in(" +
-    "select l.lh_id from lecture_hall l, booking b " +
-    "where l.lh_id = b.lh_id and " +
-    "b.alloc_start = '" +
-    req.body.start +
-    "' and " +
-    "b.alloc_end = '" +
-    req.body.end +
-    "')";
+  const sql = `select * from lecture_hall where max_capacity >= ${req.body.capacity} and lh_id not in (select l.lh_id from lecture_hall l, booking b where (l.lh_id = b.lh_id) and ((b.alloc_start<='${req.body.start}' and '${req.body.start}'<=b.alloc_end) or (b.alloc_start<='${req.body.end}' and '${req.body.end}'<=b.alloc_end) or ('${req.body.start}'<=b.alloc_start and b.alloc_start<='${req.body.end}') or ('${req.body.start}'<=b.alloc_end and b.alloc_end<='${req.body.end}')))`;
 
   db.query(sql, (err, result) => {
     if (err) throw err;
@@ -135,11 +122,21 @@ app.post("/lecturehall/available/:lh_id", (req, res) => {
   });
 });
 
-app.get("/lecturehall/all", async function (req, res, next) {
+app.get("/lecturehall/all", function (req, res, next) {
   db.query("SELECT * FROM lecture_hall", function (err, result, fields) {
     if (err) throw err;
     res.send(result);
   });
+});
+
+app.delete("/lecturehall/:id", (req, res) => {
+  db.query(
+    "DELETE FROM lecture_hall WHERE lh_id = " + req.params.id,
+    (err, result, fields) => {
+      if (err) throw err;
+      res.send(result);
+    }
+  );
 });
 
 app.delete("/allocation/:id", (req, res) => {
@@ -218,7 +215,7 @@ app.delete("/admin/timetable", (req, res) => {
 // DELETE user from database
 app.delete("/users/:id", (req, res) => {
   db.query(
-    `DELETE FROM user WHERE user_id = '$(req.params.id)'`,
+    "DELETE FROM user WHERE user_id = " + req.params.id,
     (err, result, fields) => {
       if (err) throw err;
       res.send(result);
