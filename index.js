@@ -143,8 +143,12 @@ app.get("/lecturehall/all", async function (req, res, next) {
 });
 
 app.delete("/allocation/:id", (req, res) => {
-  res.send(
-    `Server: Got a DELETE request to delete lecture hall with id: ${req.params.id}`
+  db.query(
+    "DELETE FROM booking WHERE booking_id=" + req.params.id,
+    function (err, result, fields) {
+      if (err) throw err;
+      res.send(result);
+    }
   );
 });
 
